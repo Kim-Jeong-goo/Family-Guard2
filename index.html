@@ -23,10 +23,8 @@
     body.font-normal { font-size: 16px; }
     body.font-large { font-size: 19px; }
     body.font-xlarge { font-size: 22px; }
-    body.flash-red {
-      background-color: #ffcdd2;
-      animation: flash 0.5s infinite alternate;
-    }
+    body.flash-red { background-color: #ffcdd2; animation: flash 0.5s infinite alternate; }
+
     @keyframes flash {
       from { background-color: #ffebee; }
       to { background-color: #d32f2f; }
@@ -60,16 +58,8 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    h1 {
-      margin: 10px 0 5px;
-      font-size: 1.5em;
-    }
-
-    header p {
-      margin: 0;
-      font-size: 0.9em;
-      opacity: 0.9;
-    }
+    h1 { margin: 10px 0 5px; font-size: 1.5em; }
+    header p { margin: 0; font-size: 0.9em; opacity: 0.9; }
 
     .tab-menu {
       display: flex;
@@ -138,14 +128,8 @@
       overflow-y: auto;
     }
 
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .tab-content.active { display: block; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -174,15 +158,8 @@
       border-color: #ffcdd2;
     }
 
-    .icon {
-      font-size: 1.5em;
-      margin-right: 10px;
-    }
-
-    h2#status-text {
-      margin: 0;
-      font-size: 1.1em;
-    }
+    .icon { font-size: 1.5em; margin-right: 10px; }
+    h2#status-text { margin: 0; font-size: 1.1em; }
 
     .input-section p {
       font-weight: bold;
@@ -205,9 +182,7 @@
       transition: 0.2s;
     }
 
-    .paste-btn:hover, .paste-btn:active {
-      background-color: #f57c00;
-    }
+    .paste-btn:hover, .paste-btn:active { background-color: #f57c00; }
 
     textarea {
       width: 100%;
@@ -309,6 +284,19 @@
       50% { transform: translateX(5px); }
       75% { transform: translateX(-5px); }
       100% { transform: translateX(0); }
+    }
+
+    .file-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
     }
 
     .quiz-card {
@@ -485,9 +473,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
-    .modal-buttons {
-      margin-top: 20px;
-    }
+    .modal-buttons { margin-top: 20px; }
 
     .confirm-btn {
       background: #d32f2f;
@@ -525,9 +511,7 @@
       transition: 0.2s;
     }
 
-    .reset-btn:hover {
-      background-color: #616161;
-    }
+    .reset-btn:hover { background-color: #616161; }
   </style>
 </head>
 <body class="font-normal">
@@ -577,11 +561,11 @@
         </div>
 
         <button id="mic-btn" onclick="toggleVoice()" class="mic-btn">🎙️ 실시간 감청 시작</button>
+        <button class="file-btn" onclick="document.getElementById('audio-file').click()">📂 녹음 파일 불러오기</button>
+        <input type="file" id="audio-file" accept="audio/*" style="display:none;" onchange="handleAudioFile(event)">
 
         <div id="voice-warning" class="voice-warning" style="display:none;">🚨 경고! 사기 금지어 탐지!<br>당장 전화를 끊으십시오!</div>
-
-        <textarea id="voiceInput" placeholder="통화 내용이 실시간으로 받아적히거나, 직접 붙여넣을 수 있습니다..."></textarea>
-
+        <textarea id="voiceInput" placeholder="통화 내용이 실시간으로 받아적히거나, 녹음 파일 분석 결과가 여기에 표시됩니다..." readonly></textarea>
         <button onclick="analyzeVoice()" class="analyze-btn" style="background-color: #f57c00; margin-bottom: 15px;">🧠 통화 내용 종합 판독</button>
 
         <div id="voice-result-box" class="result-box" style="display:none;">
@@ -607,7 +591,6 @@
           </div>
 
           <div id="quiz-result" class="quiz-result" style="display:none;"></div>
-
           <button onclick="generateQuiz()" class="analyze-btn" style="margin-top:20px; background-color:#1976d2; box-shadow: 0 4px 6px rgba(25,118,210,0.3);">🔄 새 문제 받기</button>
         </div>
       </div>
@@ -673,7 +656,7 @@
     let recognition = null;
     let isListening = false;
 
-    window.onload = function () {
+    window.onload = function() {
       const savedPhone = localStorage.getItem('guardianPhone');
       if (savedPhone) {
         document.getElementById('guardian-phone').value = savedPhone;
@@ -690,6 +673,7 @@
 
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
       document.getElementById(tabName).classList.add('active');
       document.getElementById(`btn-${tabName}`).classList.add('active');
     }
@@ -701,15 +685,19 @@
           alert("복사된 글자가 없습니다. 스마트폰에서 문자를 먼저 복사해 주세요!");
           return;
         }
+
         document.getElementById('userInput').value = text;
+
         const btn = document.getElementById('btn-paste');
         const originalText = "📋 복사한 문자 한 번에 붙여넣기";
         btn.innerText = "✅ 쏙! 붙여넣기 완료!";
         btn.style.backgroundColor = "#4caf50";
+
         setTimeout(() => {
           btn.innerText = originalText;
           btn.style.backgroundColor = "#ff9800";
         }, 2000);
+
       } catch (err) {
         alert("⚠️ 자동 붙여넣기가 차단되었습니다. 빈칸을 길게 눌러 '붙여넣기'를 선택해 주세요.");
       }
@@ -722,18 +710,11 @@
         body: JSON.stringify({ action, payload })
       });
 
-      const rawText = await response.text();
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (e) {
-        throw new Error("백엔드 응답이 JSON 형식이 아닙니다: " + rawText);
-      }
-
       if (!response.ok) {
-        throw new Error(data.message || "백엔드 호출 실패");
+        throw new Error("백엔드 호출 실패");
       }
+
+      const data = await response.json();
 
       if (!data.ok) {
         throw new Error(data.message || "처리 실패");
@@ -757,10 +738,10 @@
         const data = await callBackend("analyze_sms", { text: input });
         const result = data.result;
 
-        document.getElementById('analysis-result').innerHTML = result.html || "분석 결과를 불러오지 못했습니다.";
+        document.getElementById('analysis-result').innerHTML = result.html;
         document.getElementById('result-box').style.display = "block";
         document.getElementById('btn-reset-sms').style.display = "block";
-        latestAnalysisSummary = result.summary || "문자 분석 완료";
+        latestAnalysisSummary = result.summary || "분석 완료";
 
         const status = document.getElementById('status');
         const icon = document.querySelector('#status .icon');
@@ -779,8 +760,9 @@
           icon.innerText = "✅";
           text.innerText = "보안 상태: ✅ 안전";
         }
+
       } catch (e) {
-        alert("문자 분석 중 오류가 발생했습니다.\n\n" + e.message);
+        alert("문자 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
       } finally {
         btn.innerText = "🔍 정밀 문자 분석 시작";
         btn.style.backgroundColor = "#003366";
@@ -813,6 +795,7 @@
 
     function startVoice() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
       if (!SpeechRecognition) {
         alert("⚠️ 현재 사용 중인 기기 또는 브라우저에서는 실시간 음성 인식을 지원하지 않습니다.");
         return;
@@ -824,7 +807,7 @@
         recognition.interimResults = true;
         recognition.lang = 'ko-KR';
 
-        recognition.onstart = function () {
+        recognition.onstart = function() {
           isListening = true;
           const btn = document.getElementById('mic-btn');
           btn.innerText = "🛑 감청 중지 (터치하여 종료)";
@@ -834,7 +817,7 @@
           document.body.classList.remove('flash-red');
         };
 
-        recognition.onresult = function (event) {
+        recognition.onresult = function(event) {
           let finalTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
@@ -847,11 +830,12 @@
           }
         };
 
-        recognition.onend = function () {
+        recognition.onend = function() {
           stopVoice();
         };
 
         recognition.start();
+
       } catch (e) {
         alert("마이크 접근 권한이 없거나 오류가 발생했습니다.");
         stopVoice();
@@ -891,16 +875,29 @@
         const data = await callBackend("analyze_voice", { text: input });
         const result = data.result;
 
-        document.getElementById('voice-analysis-result').innerHTML = result.html || "통화 분석 결과를 불러오지 못했습니다.";
+        document.getElementById('voice-analysis-result').innerHTML = result.html;
         document.getElementById('voice-result-box').style.display = "block";
         document.getElementById('btn-reset-voice').style.display = "block";
         latestAnalysisSummary = result.summary || "통화 분석 완료";
+
       } catch (e) {
-        alert("통화 분석 중 오류가 발생했습니다.\n\n" + e.message);
+        alert("통화 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
       } finally {
         btn.innerText = "🧠 통화 내용 종합 판독";
         btn.style.backgroundColor = "#f57c00";
       }
+    }
+
+    async function handleAudioFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('voiceInput').value =
+        "선택한 파일명: " + file.name + "\n\n" +
+        "※ 현재 버전은 녹음 파일 내용을 자동 글자로 바꾸는 기능은 아직 없습니다.\n" +
+        "녹음 내용을 직접 요약해서 아래에 붙여넣거나, 실시간 감청 기능을 사용해 주세요.";
+
+      document.getElementById('btn-reset-voice').style.display = "block";
     }
 
     function resetVoice() {
@@ -910,6 +907,7 @@
       document.getElementById('voice-warning').style.display = "none";
       document.body.classList.remove('flash-red');
       latestAnalysisSummary = "분석 전입니다.";
+      document.getElementById('audio-file').value = "";
     }
 
     async function generateQuiz() {
@@ -921,7 +919,7 @@
         const data = await callBackend("get_quiz", {});
         const quiz = data.quiz;
 
-        document.getElementById('quiz-topic').innerText = `분야: ${quiz.category || "일반 상식"}`;
+        document.getElementById('quiz-topic').innerText = `분야: ${quiz.category}`;
         document.getElementById('quiz-question-box').innerHTML = `<b>Q. ${quiz.question}</b>`;
         document.getElementById('opt-0').innerText = `① ${quiz.options[0]}`;
         document.getElementById('opt-1').innerText = `② ${quiz.options[1]}`;
@@ -929,10 +927,11 @@
 
         window.currentCorrectAnswerIndex = quiz.answerIndex;
         window.currentExplanation = quiz.explanation;
+
         document.getElementById('quiz-options').style.display = 'flex';
+
       } catch (e) {
         document.getElementById('quiz-question-box').innerHTML = "<b>퀴즈를 불러오는 중 오류가 발생했습니다.</b>";
-        alert("퀴즈를 불러오는 중 오류가 발생했습니다.\n\n" + e.message);
       }
     }
 
@@ -942,10 +941,12 @@
 
       if (selectedIndex === window.currentCorrectAnswerIndex) {
         resultBox.className = 'quiz-result correct';
-        resultBox.innerHTML = `🎉 정답입니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
+        resultBox.innerHTML =
+          `🎉 정답입니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
       } else {
         resultBox.className = 'quiz-result wrong';
-        resultBox.innerHTML = `😅 아쉽습니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
+        resultBox.innerHTML =
+          `😅 아쉽습니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
       }
     }
 
@@ -968,9 +969,11 @@
         alert("올바른 전화번호를 입력하세요.");
         return;
       }
+
       localStorage.setItem('guardianPhone', cleanPhone);
       document.getElementById('guardian-phone').value = cleanPhone;
       document.getElementById('save-msg').style.display = "block";
+
       setTimeout(() => {
         document.getElementById('save-msg').style.display = "none";
       }, 3000);
@@ -1007,14 +1010,10 @@
       if (content.trim() === "") content = "(입력된 내용 없음)";
 
       const message =
-`[가족 안심가드 긴급상황 🚨]
-가족 여러분, 아래 내용 확인 부탁드립니다!
-
-■ 앱 분석 결과:
-${latestAnalysisSummary}
-
-■ 수집된 증거 본문:
-${content}`;
+        `[가족 안심가드 긴급상황 🚨]\n` +
+        `가족 여러분, 아래 내용 확인 부탁드립니다!\n\n` +
+        `■ 앱 분석 결과:\n${latestAnalysisSummary}\n\n` +
+        `■ 수집된 증거 본문:\n${content}`;
 
       const isIOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
       const separator = isIOS ? '&' : '?';
@@ -1033,6 +1032,7 @@ ${content}`;
     function submitAs() {
       const asText = document.getElementById('asInput').value;
       if (asText.trim() === "") return;
+
       alert("✅ A/S 접수가 완료되었습니다!\n[내용]: " + asText);
       document.getElementById('asInput').value = "";
       closeModal('as-modal');
