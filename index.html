@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>가족 안심가드</title>
+
+  <link rel="apple-touch-icon" href="https://robohash.org/familysafeguard?set=set3&size=180x180">
+  <link rel="icon" href="https://robohash.org/familysafeguard?set=set3&size=180x180">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s;
+    }
+    body.font-normal { font-size: 16px; }
+    body.font-large { font-size: 19px; }
+    body.font-xlarge { font-size: 22px; }
+    body.flash-red { background-color: #ffcdd2; animation: flash 0.5s infinite alternate; }
+
+    @keyframes flash {
+      from { background-color: #ffebee; }
+      to { background-color: #d32f2f; }
+    }
+
+    .app-container {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      min-height: 800px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 25px 20px 15px;
+    }
+    .logo-area img {
+      width: 90px;
+      height: 90px;
+      background-color: #e8f5e9;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    h1 { margin: 10px 0 5px; font-size: 1.5em; }
+    header p { margin: 0; font-size: 0.9em; opacity: 0.9; }
+
+    .tab-menu {
+      display: flex;
+      background-color: #ffffff;
+      padding: 0 2px;
+      border-bottom: 3px solid #ccc;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      margin: 0 2px;
+      border: 2px solid #ddd;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1em;
+      background: #eee;
+      color: #333;
+    }
+
+    #btn-sms-tab, #btn-voice-tab {
+      background-color: #c8e6c9;
+      color: #1b5e20;
+      border-color: #a5d6a7;
+    }
+    #btn-sms-tab.active, #btn-voice-tab.active {
+      background-color: #2e7d32;
+      color: white;
+      border-color: #2e7d32;
+      border-bottom: 3px solid #2e7d32;
+      box-shadow: 0 -4px 10px rgba(46, 125, 50, 0.4);
+    }
+
+    #btn-quiz-tab {
+      background-color: #bbdefb;
+      color: #0d47a1;
+      border-color: #90caf9;
+    }
+    #btn-quiz-tab.active {
+      background-color: #1976d2;
+      color: white;
+      border-color: #1976d2;
+      border-bottom: 3px solid #1976d2;
+      box-shadow: 0 -4px 10px rgba(25, 118, 210, 0.4);
+    }
+
+    #btn-setting-tab {
+      background-color: #e0e0e0;
+      color: #555;
+    }
+    #btn-setting-tab.active {
+      background-color: #455a64;
+      color: white;
+      border-color: #455a64;
+      border-bottom: 3px solid #455a64;
+      box-shadow: 0 -4px 10px rgba(69, 90, 100, 0.4);
+    }
+
+    main {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .tab-content.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-card {
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+    }
+    .status-card.safe {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-color: #c8e6c9;
+    }
+    .status-card.caution {
+      background-color: #fff8e1;
+      color: #f57c00;
+      border-color: #ffe082;
+    }
+    .status-card.danger {
+      background-color: #ffebee;
+      color: #c62828;
+      border-color: #ffcdd2;
+    }
+    .icon { font-size: 1.5em; margin-right: 10px; }
+    h2#status-text { margin: 0; font-size: 1.1em; }
+
+    .input-section p {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .paste-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3);
+      transition: 0.2s;
+    }
+    .paste-btn:hover, .paste-btn:active { background-color: #f57c00; }
+
+    textarea {
+      width: 100%;
+      height: 110px;
+      padding: 12px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      resize: none;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .result-box {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-left: 5px solid #003366;
+      border-radius: 4px;
+      line-height: 1.6;
+      word-break: keep-all;
+      white-space: normal;
+    }
+
+    .sos-btn {
+      width: 100%;
+      padding: 16px;
+      background-color: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(211, 47, 47, 0.3);
+    }
+
+    .voice-guide {
+      background: #fff9c4;
+      border: 1px solid #fbc02d;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .mic-btn {
+      width: 100%;
+      padding: 20px;
+      background-color: #388e3c;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: 0.3s;
+    }
+    .mic-btn.recording {
+      background-color: #d32f2f;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+      to { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); }
+    }
+
+    .voice-warning {
+      background-color: #d32f2f;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      animation: shake 0.5s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .quiz-card {
+      background: #fafafa;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .quiz-question {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #333;
+      line-height: 1.5;
+      word-break: keep-all;
+      min-height: 60px;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quiz-opt-btn {
+      padding: 15px;
+      font-size: 1.05em;
+      font-weight: bold;
+      background: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      word-break: keep-all;
+      color: #444;
+      text-align: left;
+    }
+    .quiz-opt-btn:hover, .quiz-opt-btn:active {
+      background: #e3f2fd;
+      border-color: #2196f3;
+      color: #0d47a1;
+    }
+    .quiz-result {
+      margin-top: 20px;
+      font-size: 1.05em;
+      font-weight: bold;
+      padding: 15px;
+      border-radius: 8px;
+      animation: popIn 0.5s ease-out;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .quiz-result.correct {
+      background: #c8e6c9;
+      color: #2e7d32;
+      border: 2px solid #4caf50;
+    }
+    .quiz-result.wrong {
+      background: #ffcdd2;
+      color: #c62828;
+      border: 2px solid #f44336;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .settings-card {
+      background-color: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+    }
+    .setting-item {
+      padding: 15px 0;
+      border-bottom: 1px dashed #ccc;
+    }
+    .setting-item p {
+      font-size: 0.95em;
+      color: #444;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .font-size-group { display: flex; gap: 10px; }
+    .font-btn {
+      flex: 1;
+      padding: 10px;
+      background: white;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #333;
+    }
+    .font-btn.active {
+      background: #2e7d32;
+      color: white;
+      border-color: #2e7d32;
+    }
+    .font-btn.normal { font-size: 15px; font-weight: 500; }
+    .font-btn.large { font-size: 18px; font-weight: 700; }
+    .font-btn.xlarge { font-size: 21px; font-weight: 900; letter-spacing: -1px; }
+
+    .phone-input-group { display: flex; gap: 10px; }
+    .phone-input-group input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    .save-btn {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .as-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      width: 85%;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .modal-buttons { margin-top: 20px; }
+
+    .confirm-btn {
+      background: #d32f2f;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      margin-bottom: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cancel-btn {
+      background: #757575;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: #757575;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .reset-btn:hover { background-color: #616161; }
+
+    .small-note {
+      font-size: 0.9em;
+      color: #666;
+      line-height: 1.5;
+      text-align: left;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body class="font-normal">
+  <div class="app-container">
+    <header>
+      <div class="logo-area">
+        <img src="https://robohash.org/familysafeguard?set=set3&size=150x150" alt="가족 안심가드 로고">
+      </div>
+      <h1>🛡️ 가족 안심가드</h1>
+      <p>우리 가족이 함께 지키는 안전한 스마트폰</p>
+    </header>
+
+    <div class="tab-menu">
+      <button onclick="openTab('sms-tab')" class="tab-btn active" id="btn-sms-tab">💬 문자</button>
+      <button onclick="openTab('voice-tab')" class="tab-btn" id="btn-voice-tab">🎙️ 통화</button>
+      <button onclick="openTab('quiz-tab')" class="tab-btn" id="btn-quiz-tab">🧠 퀴즈</button>
+      <button onclick="openTab('setting-tab')" class="tab-btn" id="btn-setting-tab">⚙️ 설정</button>
+    </div>
+
+    <main>
+      <div id="sms-tab" class="tab-content active">
+        <div id="status" class="status-card safe">
+          <div class="icon">✅</div>
+          <h2 id="status-text">현재 문자 보안: 안전</h2>
+        </div>
+
+        <div class="input-section">
+          <p>의심되는 문자를 붙여넣으세요</p>
+          <button onclick="pasteFromClipboard()" id="btn-paste" class="paste-btn">📋 복사한 문자 한 번에 붙여넣기</button>
+          <textarea id="userInput" placeholder="예: [국제발신] 해외결제 승인완료..."></textarea>
+          <button onclick="analyzeText()" id="sms-analyze-btn" class="analyze-btn">🔍 AI 문자 정밀 분석</button>
+        </div>
+
+        <div id="result-box" class="result-box" style="display:none;">
+          <h3>분석 결과:</h3>
+          <div id="analysis-result"></div>
+        </div>
+
+        <button onclick="resetSms()" id="btn-reset-sms" class="reset-btn" style="display:none; margin-top: 15px;">🔄 내용 지우고 새 문자 검사하기</button>
+        <button onclick="openSosModal('sms')" class="sos-btn">🚨 가족에게 긴급 SOS 보내기</button>
+      </div>
+
+      <div id="voice-tab" class="tab-content">
+        <div class="voice-guide">
+          <p>의심스러운 전화를 받으셨나요?</p>
+          <p><b>1. 스피커폰을 켭니다.</b><br><b>2. 아래 버튼을 누르세요.</b></p>
+        </div>
+
+        <button id="mic-btn" onclick="toggleVoice()" class="mic-btn">🎙️ 실시간 감청 시작</button>
+        <div id="voice-warning" class="voice-warning" style="display:none;">🚨 경고! 사기 금지어 탐지!<br>당장 전화를 끊으십시오!</div>
+
+        <textarea id="voiceInput" placeholder="통화 내용이 실시간으로 받아적힙니다..." readonly></textarea>
+        <button onclick="analyzeVoice()" id="voice-analyze-btn" class="analyze-btn" style="background-color: #f57c00; margin-bottom: 15px;">🧠 통화 내용 종합 판독</button>
+
+        <div id="voice-result-box" class="result-box" style="display:none;">
+          <h3>통화 판독 결과:</h3>
+          <div id="voice-analysis-result"></div>
+        </div>
+
+        <button onclick="resetVoice()" id="btn-reset-voice" class="reset-btn" style="display:none; margin-top: 15px; margin-bottom: 15px;">🔄 내용 지우고 새 통화 감청하기</button>
+        <button onclick="openSosModal('voice')" class="sos-btn">🚨 통화내용 SOS 보내기</button>
+
+        <div class="small-note">
+          일부 기기/브라우저에서는 실시간 음성 인식이 제한될 수 있습니다. 안 되면 통화 내용을 직접 입력해서 판독해도 됩니다.
+        </div>
+      </div>
+
+      <div id="quiz-tab" class="tab-content">
+        <div class="quiz-card">
+          <h3 style="margin-top: 0; color: #1565c0;">📝 오늘의 상식 퀴즈</h3>
+          <p id="quiz-topic" style="color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 5px; border-radius: 5px; display: inline-block;">분야: 출제 대기 중...</p>
+
+          <div id="quiz-question-box" class="quiz-question">
+            아래 버튼을 눌러 오늘의 문제를 받아보세요!
+          </div>
+
+          <div id="quiz-options" class="quiz-options" style="display:none;">
+            <button class="quiz-opt-btn" onclick="checkAnswer(0)" id="opt-0">보기 1</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(1)" id="opt-1">보기 2</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(2)" id="opt-2">보기 3</button>
+          </div>
+
+          <div id="quiz-result" class="quiz-result" style="display:none;"></div>
+
+          <button onclick="generateQuiz()" id="quiz-generate-btn" class="analyze-btn" style="margin-top:20px; background-color:#1976d2; box-shadow: 0 4px 6px rgba(25,118,210,0.3);">🔄 새 문제 받기</button>
+
+          <div class="small-note">
+            서버 응답이 늦거나 실패하면, 앱 내부의 예비 문제로 자동 전환됩니다.
+          </div>
+        </div>
+      </div>
+
+      <div id="setting-tab" class="tab-content">
+        <div class="settings-card">
+          <h3 style="text-align: center; margin-top: 0; color: #333;">⚙️ 환경 설정</h3>
+
+          <div class="setting-item">
+            <p>🔍 글자 크기 조절</p>
+            <div class="font-size-group">
+              <button onclick="changeFontSize('normal')" class="font-btn normal">보통</button>
+              <button onclick="changeFontSize('large')" class="font-btn large">크게</button>
+              <button onclick="changeFontSize('xlarge')" class="font-btn xlarge">아주 크게</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <p>📞 긴급 SOS 수신 번호</p>
+            <div class="phone-input-group">
+              <input type="tel" id="guardian-phone" placeholder="예: 01012345678">
+              <button onclick="savePhone()" class="save-btn">저장</button>
+            </div>
+            <p id="save-msg" style="color: #2e7d32; font-weight: bold; display: none; margin-top: 10px;">✅ 저장되었습니다!</p>
+          </div>
+
+          <div class="setting-item" style="border-bottom: none;">
+            <p>🛠️ 앱 사용 중 에러가 발생했나요?</p>
+            <button onclick="openAsModal()" class="as-btn">고객센터 A/S 신청</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="sos-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>🚨 긴급 상황 전파</h2>
+        <p>수집된 증거와 분석 결과를<br>가족에게 전송하시겠습니까?</p>
+        <div class="modal-buttons">
+          <button onclick="sendSos()" class="confirm-btn">네, 전송합니다</button>
+          <button onclick="closeModal('sos-modal')" class="cancel-btn">취소</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="as-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>🛠️ A/S 및 오류 신고</h2>
+        <textarea id="asInput" placeholder="불편사항을 적어주세요." style="height: 80px;"></textarea>
+        <div class="modal-buttons">
+          <button onclick="submitAs()" class="confirm-btn" style="background-color: #003366;">신고 접수</button>
+          <button onclick="closeModal('as-modal')" class="cancel-btn">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzZ41gobPzd2_aMOYLK-DncUBMoYq9vjrqUWiOOyaHYxu_yHh8m9Yos1MW2Nk5x_ur2Ew/exec';
+
+    let currentSosType = 'sms';
+    let latestAnalysisSummary = '분석 전입니다.';
+    let currentCorrectAnswerIndex = -1;
+    let currentExplanation = '';
+    let preloadedQuiz = null;
+
+    window.onload = function () {
+      const savedPhone = localStorage.getItem('guardianPhone');
+      if (savedPhone) {
+        document.getElementById('guardian-phone').value = savedPhone;
+      }
+
+      const savedFontSize = localStorage.getItem('appFontSize') || 'normal';
+      changeFontSize(savedFontSize);
+
+      preloadQuiz();
+    };
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function openTab(tabName) {
+      document.querySelector('.tab-menu').style.borderBottomColor =
+        (tabName === 'quiz-tab') ? '#1976d2' :
+        (tabName === 'setting-tab') ? '#455a64' : '#2e7d32';
+
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabName).classList.add('active');
+      document.getElementById(`btn-${tabName}`).classList.add('active');
+    }
+
+    function changeFontSize(size) {
+      document.body.classList.remove('font-normal', 'font-large', 'font-xlarge');
+      document.body.classList.add(`font-${size}`);
+      localStorage.setItem('appFontSize', size);
+      updateActiveFontBtn(size);
+    }
+
+    function updateActiveFontBtn(size) {
+      document.querySelectorAll('.font-btn').forEach(btn => btn.classList.remove('active'));
+      const targetBtn = document.querySelector(`.font-btn.${size}`);
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    function savePhone() {
+      const cleanPhone = document.getElementById('guardian-phone').value.replace(/[^0-9]/g, '');
+      if (cleanPhone.length < 9) {
+        alert('올바른 전화번호를 입력하세요.');
+        return;
+      }
+      localStorage.setItem('guardianPhone', cleanPhone);
+      document.getElementById('guardian-phone').value = cleanPhone;
+      document.getElementById('save-msg').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('save-msg').style.display = 'none';
+      }, 3000);
+    }
+
+    function openSosModal(type) {
+      currentSosType = type;
+      document.getElementById('sos-modal').style.display = 'flex';
+    }
+
+    function openAsModal() {
+      document.getElementById('as-modal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      if (id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      }
+    }
+
+    async function apiPost(action, payload = {}) {
+      const response = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({ action, ...payload })
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || '백엔드 오류');
+      }
+      return data;
+    }
+
+    function setStatus(verdict) {
+      const status = document.getElementById('status');
+      const statusText = document.getElementById('status-text');
+      const icon = document.querySelector('#status .icon');
+
+      status.classList.remove('safe', 'caution', 'danger');
+
+      if (verdict === '위험') {
+        status.classList.add('danger');
+        statusText.innerText = '보안 상태: 🚨 위험 감지!';
+        icon.innerText = '🚨';
+      } else if (verdict === '주의') {
+        status.classList.add('caution');
+        statusText.innerText = '보안 상태: ⚠️ 주의 요망';
+        icon.innerText = '⚠️';
+      } else {
+        status.classList.add('safe');
+        statusText.innerText = '보안 상태: ✅ 안전';
+        icon.innerText = '✅';
+      }
+    }
+
+    function formatAnalysisHtml(data) {
+      const reasons = (data.reasons || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+      const advice = (data.advice || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+
+      return `
+        <p><b>판정:</b> ${escapeHtml(data.verdict)} (${escapeHtml(String(data.score))}점)</p>
+        <p><b>요약:</b> ${escapeHtml(data.summary)}</p>
+        <p><b>판단 근거:</b></p>
+        <ul>${reasons}</ul>
+        <p><b>권장 조치:</b></p>
+        <ul>${advice}</ul>
+      `;
+    }
+
+    function localAnalyzeText(text) {
+      let score = 0;
+      const reasons = [];
+      const advice = [];
+
+      if (/http|www|bit\.ly|tinyurl|\.com|\.kr|\.net/i.test(text)) {
+        score += 40;
+        reasons.push('인터넷 링크가 포함되어 있습니다.');
+      }
+      if (/검찰|경찰|금감원|금융감독원|수사관|안전계좌|대포통장/.test(text)) {
+        score += 30;
+        reasons.push('기관 사칭 또는 금융사기 표현이 보입니다.');
+      }
+      if (/송금|입금|상품권|기프트|문화상품권|구글기프트/.test(text)) {
+        score += 20;
+        reasons.push('금전 요구 또는 상품권 요구 표현이 보입니다.');
+      }
+      if (/원격|앱 설치|apk|설치하세요|다운로드/.test(text)) {
+        score += 20;
+        reasons.push('원격제어/앱 설치 유도 표현이 보입니다.');
+      }
+      if (/비밀번호|인증번호|주민번호|계좌번호/.test(text)) {
+        score += 20;
+        reasons.push('민감정보 입력 요구가 의심됩니다.');
+      }
+
+      let verdict = '안전';
+      if (score >= 60) verdict = '위험';
+      else if (score >= 25) verdict = '주의';
+
+      if (verdict === '위험') {
+        advice.push('링크를 누르지 마십시오.');
+        advice.push('전화나 문자로 응답하지 마십시오.');
+        advice.push('가족에게 SOS를 보내 확인을 받으십시오.');
+      } else if (verdict === '주의') {
+        advice.push('발신처를 다시 확인해 보십시오.');
+        advice.push('확실하지 않으면 링크를 누르지 마십시오.');
+      } else {
+        advice.push('특별한 위험 표현은 적어 보입니다.');
+        advice.push('그래도 모르는 번호라면 주의하십시오.');
+      }
+
+      return {
+        verdict,
+        score,
+        summary: verdict === '위험'
+          ? '사기 가능성이 높아 보입니다.'
+          : verdict === '주의'
+            ? '주의가 필요한 문자입니다.'
+            : '특이 위험 신호는 적어 보입니다.',
+        reasons: reasons.length ? reasons : ['대표적인 위험 표현은 발견되지 않았습니다.'],
+        advice
+      };
+    }
+
+    function localAnalyzeVoice(text) {
+      let score = 0;
+      const reasons = [];
+      const advice = [];
+
+      if (/검찰|경찰|수사관|안전계좌|대포통장/.test(text)) {
+        score += 40;
+        reasons.push('기관 사칭성 표현이 보입니다.');
+      }
+      if (/송금|입금|돈 보내|이체/.test(text)) {
+        score += 30;
+        reasons.push('금전 이체 요구 표현이 보입니다.');
+      }
+      if (/원격|앱 설치|깔아|설치해/.test(text)) {
+        score += 20;
+        reasons.push('원격조작 앱 설치 유도가 의심됩니다.');
+      }
+      if (/비밀번호|인증번호|계좌번호/.test(text)) {
+        score += 20;
+        reasons.push('민감정보 요구가 의심됩니다.');
+      }
+
+      let verdict = '안전';
+      if (score >= 60) verdict = '위험';
+      else if (score >= 25) verdict = '주의';
+
+      if (verdict === '위험') {
+        advice.push('즉시 전화를 끊으십시오.');
+        advice.push('상대가 시키는 앱 설치나 송금을 하지 마십시오.');
+        advice.push('가족이나 112에 바로 확인하십시오.');
+      } else if (verdict === '주의') {
+        advice.push('상대 신원을 다시 확인하십시오.');
+        advice.push('금전 요구가 나오면 즉시 통화를 종료하십시오.');
+      } else {
+        advice.push('대표적인 보이스피싱 표현은 적어 보입니다.');
+        advice.push('그래도 돈이나 개인정보 요구가 나오면 끊으십시오.');
+      }
+
+      return {
+        verdict,
+        score,
+        summary: verdict === '위험'
+          ? '보이스피싱 가능성이 높아 보입니다.'
+          : verdict === '주의'
+            ? '주의가 필요한 통화입니다.'
+            : '특이 위험 신호는 적어 보입니다.',
+        reasons: reasons.length ? reasons : ['대표적인 위험 표현은 발견되지 않았습니다.'],
+        advice
+      };
+    }
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text.trim() === '') {
+          alert('복사된 글자가 없습니다. 스마트폰에서 문자를 먼저 복사해 주세요!');
+          return;
+        }
+
+        document.getElementById('userInput').value = text;
+
+        const btn = document.getElementById('btn-paste');
+        const originalText = '📋 복사한 문자 한 번에 붙여넣기';
+        btn.innerText = '✅ 쏙! 붙여넣기 완료!';
+        btn.style.backgroundColor = '#4caf50';
+
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.backgroundColor = '#ff9800';
+        }, 2000);
+      } catch (err) {
+        alert('자동 붙여넣기가 차단되었습니다. 빈칸을 꾹 눌러 직접 붙여넣기 해 주세요.');
+      }
+    }
+
+    async function analyzeText() {
+      const input = document.getElementById('userInput').value.trim();
+      if (!input) {
+        alert('검사할 문자를 입력해 주십시오!');
+        return;
+      }
+
+      const btn = document.getElementById('sms-analyze-btn');
+      btn.innerText = '⏳ 분석 중...';
+      btn.style.backgroundColor = '#555';
+
+      try {
+        const response = await apiPost('analyzeText', { text: input });
+        const data = response.data;
+
+        latestAnalysisSummary = `${data.verdict}: ${data.summary}`;
+        setStatus(data.verdict);
+
+        document.getElementById('analysis-result').innerHTML = formatAnalysisHtml(data);
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('btn-reset-sms').style.display = 'block';
+      } catch (err) {
+        const data = localAnalyzeText(input);
+
+        latestAnalysisSummary = `[예비판정] ${data.verdict}: ${data.summary}`;
+        setStatus(data.verdict);
+
+        document.getElementById('analysis-result').innerHTML =
+          `<p><b>서버 분석 실패로 예비판정을 사용했습니다.</b></p>` + formatAnalysisHtml(data);
+
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('btn-reset-sms').style.display = 'block';
+      } finally {
+        btn.innerText = '🔍 AI 문자 정밀 분석';
+        btn.style.backgroundColor = '#003366';
+      }
+    }
+
+    function resetSms() {
+      document.getElementById('userInput').value = '';
+      document.getElementById('result-box').style.display = 'none';
+      document.getElementById('btn-reset-sms').style.display = 'none';
+      latestAnalysisSummary = '분석 전입니다.';
+
+      const status = document.getElementById('status');
+      status.classList.remove('safe', 'caution', 'danger');
+      status.classList.add('safe');
+      document.getElementById('status-text').innerText = '현재 문자 보안: 안전';
+      document.querySelector('#status .icon').innerText = '✅';
+    }
+
+    let recognition = null;
+    let isListening = false;
+
+    function toggleVoice() {
+      if (!isListening) startVoice();
+      else stopVoice();
+    }
+
+    function stopVoiceUI() {
+      isListening = false;
+      const btn = document.getElementById('mic-btn');
+      btn.innerText = '🎙️ 실시간 감청 시작';
+      btn.classList.remove('recording');
+      document.body.classList.remove('flash-red');
+    }
+
+    function startVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('현재 기기 또는 브라우저에서는 실시간 음성 인식을 지원하지 않습니다. 통화 내용을 직접 입력해서 판독해 주세요.');
+        return;
+      }
+
+      try {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'ko-KR';
+
+        recognition.onstart = function () {
+          isListening = true;
+          const btn = document.getElementById('mic-btn');
+          btn.innerText = '🛑 감청 중지 (터치하여 종료)';
+          btn.classList.add('recording');
+
+          document.getElementById('voiceInput').value = '';
+          document.getElementById('voice-warning').style.display = 'none';
+          document.body.classList.remove('flash-red');
+        };
+
+        recognition.onresult = function (event) {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript + ' ';
+            }
+          }
+
+          if (finalTranscript) {
+            const input = document.getElementById('voiceInput');
+            input.value += finalTranscript;
+            checkPhishingKeywords(input.value);
+          }
+        };
+
+        recognition.onerror = function () {
+          stopVoiceUI();
+          alert('마이크 권한 또는 음성 인식 오류가 발생했습니다. 설정을 확인해 주세요.');
+        };
+
+        recognition.onend = function () {
+          stopVoiceUI();
+        };
+
+        recognition.start();
+      } catch (e) {
+        stopVoiceUI();
+        alert('음성 인식을 시작할 수 없습니다.');
+      }
+    }
+
+    function stopVoice() {
+      try {
+        if (recognition) recognition.stop();
+      } catch (e) {}
+      stopVoiceUI();
+    }
+
+    function checkPhishingKeywords(text) {
+      const keywords = ['검찰', '경찰', '계좌', '비밀번호', '송금', '원격', '상품권', '구속', '대포통장', '수사관', '안전계좌'];
+      if (keywords.some(kw => text.includes(kw))) {
+        document.getElementById('voice-warning').style.display = 'block';
+        document.body.classList.add('flash-red');
+      }
+    }
+
+    async function analyzeVoice() {
+      const input = document.getElementById('voiceInput').value.trim();
+      if (!input) {
+        alert('녹음된 통화 내용이 없습니다!');
+        return;
+      }
+
+      const btn = document.getElementById('voice-analyze-btn');
+      btn.innerText = '⏳ 판독 중...';
+      btn.style.backgroundColor = '#555';
+
+      try {
+        const response = await apiPost('analyzeVoice', { text: input });
+        const data = response.data;
+
+        latestAnalysisSummary = `${data.verdict}: ${data.summary}`;
+
+        document.getElementById('voice-analysis-result').innerHTML = formatAnalysisHtml(data);
+        document.getElementById('voice-result-box').style.display = 'block';
+        document.getElementById('btn-reset-voice').style.display = 'block';
+      } catch (err) {
+        const data = localAnalyzeVoice(input);
+
+        latestAnalysisSummary = `[예비판정] ${data.verdict}: ${data.summary}`;
+
+        document.getElementById('voice-analysis-result').innerHTML =
+          `<p><b>서버 판독 실패로 예비판정을 사용했습니다.</b></p>` + formatAnalysisHtml(data);
+
+        document.getElementById('voice-result-box').style.display = 'block';
+        document.getElementById('btn-reset-voice').style.display = 'block';
+      } finally {
+        btn.innerText = '🧠 통화 내용 종합 판독';
+        btn.style.backgroundColor = '#f57c00';
+      }
+    }
+
+    function resetVoice() {
+      document.getElementById('voiceInput').value = '';
+      document.getElementById('voice-result-box').style.display = 'none';
+      document.getElementById('btn-reset-voice').style.display = 'none';
+      document.getElementById('voice-warning').style.display = 'none';
+      document.body.classList.remove('flash-red');
+      latestAnalysisSummary = '분석 전입니다.';
+    }
+
+    const localQuizPool = [
+      { topic: '건강 상식', question: '치매 예방에 도움 되는 생활 습관은 무엇일까요?', options: ['매일 30분 걷기', '하루 종일 누워 있기', '단 음식을 자주 먹기'], answerIndex: 0, explanation: '규칙적인 걷기 운동은 뇌혈류 개선과 건강 유지에 도움이 됩니다.' },
+      { topic: '생활 상식', question: '모르는 번호로 온 링크 문자를 받았을 때 가장 안전한 행동은?', options: ['바로 누른다', '가족에게 먼저 물어본다', '답장을 보낸다'], answerIndex: 1, explanation: '확실하지 않은 링크는 누르지 말고 먼저 가족이나 지인과 확인하는 것이 좋습니다.' },
+      { topic: '역사 상식', question: '세종대왕이 널리 알려진 업적으로 맞는 것은?', options: ['훈민정음 창제', '거북선 제작', '팔만대장경 제작'], answerIndex: 0, explanation: '세종대왕은 훈민정음을 창제하여 백성이 쉽게 글을 익히도록 했습니다.' },
+      { topic: '피싱 예방 상식', question: '검찰을 사칭하며 안전계좌로 돈을 보내라고 하면 어떻게 해야 할까요?', options: ['즉시 송금한다', '전화를 끊고 112 등에 확인한다', '비밀번호를 알려준다'], answerIndex: 1, explanation: '국가기관은 개인에게 안전계좌 송금을 요구하지 않습니다.' }
+    ];
+
+    function pickLocalQuiz() {
+      return localQuizPool[Math.floor(Math.random() * localQuizPool.length)];
+    }
+
+    async function preloadQuiz() {
+      try {
+        const response = await apiPost('generateQuiz');
+        preloadedQuiz = response.data;
+      } catch (err) {
+        preloadedQuiz = null;
+      }
+    }
+
+    function renderQuiz(quizData, isFallback = false) {
+      document.getElementById('quiz-topic').innerText =
+        `분야: ${quizData.topic}${isFallback ? ' (예비문제)' : ''}`;
+
+      document.getElementById('quiz-question-box').innerHTML =
+        `<b>Q. ${escapeHtml(quizData.question)}</b>`;
+
+      document.getElementById('opt-0').innerText = `① ${quizData.options[0]}`;
+      document.getElementById('opt-1').innerText = `② ${quizData.options[1]}`;
+      document.getElementById('opt-2').innerText = `③ ${quizData.options[2]}`;
+
+      currentCorrectAnswerIndex = quizData.answerIndex;
+      currentExplanation = quizData.explanation;
+
+      document.getElementById('quiz-options').style.display = 'flex';
+      document.getElementById('quiz-result').style.display = 'none';
+    }
+
+    async function generateQuiz() {
+      const btn = document.getElementById('quiz-generate-btn');
+      btn.innerText = '⏳ 문제 준비 중...';
+
+      document.getElementById('quiz-options').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'none';
+
+      try {
+        if (preloadedQuiz) {
+          renderQuiz(preloadedQuiz, false);
+          preloadedQuiz = null;
+          preloadQuiz();
+        } else {
+          const response = await apiPost('generateQuiz');
+          renderQuiz(response.data, false);
+          preloadQuiz();
+        }
+      } catch (err) {
+        renderQuiz(pickLocalQuiz(), true);
+      } finally {
+        btn.innerText = '🔄 새 문제 받기';
+      }
+    }
+
+    function checkAnswer(selectedIndex) {
+      const resultBox = document.getElementById('quiz-result');
+      resultBox.style.display = 'block';
+
+      if (selectedIndex === currentCorrectAnswerIndex) {
+        resultBox.className = 'quiz-result correct';
+        resultBox.innerHTML =
+          `🎉 정답입니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${escapeHtml(currentExplanation)}</span>`;
+      } else {
+        resultBox.className = 'quiz-result wrong';
+        resultBox.innerHTML =
+          `😅 아쉽습니다. 다시 도전해 보세요.<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${escapeHtml(currentExplanation)}</span>`;
+      }
+    }
+
+    function sendSos() {
+      const savedPhone = localStorage.getItem('guardianPhone');
+      if (!savedPhone) {
+        alert('⚠️ 설정 탭에서 가족 번호를 먼저 저장해 주세요.');
+        closeModal('sos-modal');
+        openTab('setting-tab');
+        return;
+      }
+
+      let content = '';
+      if (currentSosType === 'sms') {
+        content = document.getElementById('userInput').value.trim();
+      } else {
+        content = document.getElementById('voiceInput').value.trim();
+      }
+
+      if (!content) content = '(입력된 내용 없음)';
+
+      const message =
+        `[가족 안심가드 긴급상황 🚨]\n` +
+        `가족 여러분, 아래 내용을 확인해 주세요.\n\n` +
+        `■ 앱 분석 결과\n${latestAnalysisSummary}\n\n` +
+        `■ 수집된 증거 본문\n${content}`;
+
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const separator = isIOS ? '&' : '?';
+
+      const hiddenLink = document.createElement('a');
+      hiddenLink.href = `sms:${savedPhone}${separator}body=${encodeURIComponent(message)}`;
+      hiddenLink.target = '_blank';
+
+      document.body.appendChild(hiddenLink);
+      hiddenLink.click();
+      document.body.removeChild(hiddenLink);
+
+      closeModal('sos-modal');
+    }
+
+    function submitAs() {
+      const asText = document.getElementById('asInput').value.trim();
+      if (!asText) return;
+      alert(`✅ A/S 접수가 완료되었습니다!\n[내용]: ${asText}`);
+      document.getElementById('asInput').value = '';
+      closeModal('as-modal');
+    }
+  </script>
+</body>
+</html>
