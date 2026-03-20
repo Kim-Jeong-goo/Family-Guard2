@@ -4,552 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>가족 안심가드</title>
-
   <link rel="apple-touch-icon" href="https://robohash.org/familysafeguard?set=set3&size=180x180">
   <link rel="icon" href="https://robohash.org/familysafeguard?set=set3&size=180x180">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-
   <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #f0f2f5;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      transition: background-color 0.3s;
-    }
-
+    body { font-family: 'Noto Sans KR', sans-serif; background-color: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; transition: background-color 0.3s; }
     body.font-normal { font-size: 16px; }
     body.font-large { font-size: 19px; }
     body.font-xlarge { font-size: 22px; }
+    body.flash-red { background-color: #ffcdd2; animation: flash 0.5s infinite alternate; }
+    @keyframes flash { from { background-color: #ffebee; } to { background-color: #d32f2f; } }
 
-    body.flash-red {
-      background-color: #ffcdd2;
-      animation: flash 0.5s infinite alternate;
-    }
+    .app-container { background-color: #ffffff; width: 100%; max-width: 400px; min-height: 800px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+    header { background-color: #2e7d32; color: white; text-align: center; padding: 25px 20px 15px; }
+    .logo-area img { width: 90px; height: 90px; background-color: #e8f5e9; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    h1 { margin: 10px 0 5px; font-size: 1.5em; }
+    header p { margin: 0; font-size: 0.9em; opacity: 0.9; }
 
-    @keyframes flash {
-      from { background-color: #ffebee; }
-      to { background-color: #d32f2f; }
-    }
+    .tab-menu { display: flex; background-color: #ffffff; padding: 0 2px; border-bottom: 3px solid #ccc; }
+    .tab-btn { flex: 1; padding: 12px 0; margin: 0 2px; border: 2px solid #ddd; border-bottom: none; border-radius: 12px 12px 0 0; font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 1em; }
 
-    .app-container {
-      background-color: #ffffff;
-      width: 100%;
-      max-width: 400px;
-      min-height: 800px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      border-radius: 20px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+    #btn-sms-tab, #btn-voice-tab { background-color: #c8e6c9; color: #1b5e20; border-color: #a5d6a7; }
+    #btn-sms-tab.active, #btn-voice-tab.active { background-color: #2e7d32; color: white; border-color: #2e7d32; border-bottom: 3px solid #2e7d32; box-shadow: 0 -4px 10px rgba(46, 125, 50, 0.4); }
 
-    header {
-      background-color: #2e7d32;
-      color: white;
-      text-align: center;
-      padding: 25px 20px 15px;
-    }
+    #btn-quiz-tab { background-color: #bbdefb; color: #0d47a1; border-color: #90caf9; }
+    #btn-quiz-tab.active { background-color: #1976d2; color: white; border-color: #1976d2; border-bottom: 3px solid #1976d2; box-shadow: 0 -4px 10px rgba(25, 118, 210, 0.4); }
 
-    .logo-area img {
-      width: 90px;
-      height: 90px;
-      background-color: #e8f5e9;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
+    #btn-setting-tab { background-color: #e0e0e0; color: #555; }
+    #btn-setting-tab.active { background-color: #455a64; color: white; border-color: #455a64; border-bottom: 3px solid #455a64; box-shadow: 0 -4px 10px rgba(69, 90, 100, 0.4); }
 
-    h1 {
-      margin: 10px 0 5px;
-      font-size: 1.5em;
-    }
+    main { padding: 20px; flex-grow: 1; overflow-y: auto; }
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    header p {
-      margin: 0;
-      font-size: 0.9em;
-      opacity: 0.9;
-    }
+    .status-card { border-radius: 10px; padding: 15px; display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; border: 1px solid #ccc; }
+    .status-card.safe { background-color: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+    .status-card.danger { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; }
+    .icon { font-size: 1.5em; margin-right: 10px; }
+    h2#status-text { margin: 0; font-size: 1.1em; }
 
-    .tab-menu {
-      display: flex;
-      background-color: #ffffff;
-      padding: 0 2px;
-      border-bottom: 3px solid #ccc;
-    }
+    .input-section p { font-weight: bold; margin-bottom: 10px; color: #333; }
+    .paste-btn { width: 100%; padding: 15px; background-color: #ff9800; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3); transition: 0.2s; }
+    .paste-btn:hover, .paste-btn:active { background-color: #f57c00; }
 
-    .tab-btn {
-      flex: 1;
-      padding: 12px 0;
-      margin: 0 2px;
-      border: 2px solid #ddd;
-      border-bottom: none;
-      border-radius: 12px 12px 0 0;
-      font-weight: 900;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 1em;
-    }
+    textarea { width: 100%; height: 100px; padding: 12px; border: 2px solid #ccc; border-radius: 8px; font-size: 1em; resize: none; box-sizing: border-box; margin-bottom: 15px; }
+    .analyze-btn { width: 100%; padding: 15px; background-color: #003366; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
 
-    #btn-sms-tab, #btn-voice-tab {
-      background-color: #c8e6c9;
-      color: #1b5e20;
-      border-color: #a5d6a7;
-    }
+    .result-box { margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 5px solid #003366; border-radius: 4px; line-height: 1.6; word-break: keep-all; }
+    .sos-btn { width: 100%; padding: 16px; background-color: #d32f2f; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 6px rgba(211, 47, 47, 0.3); }
 
-    #btn-sms-tab.active, #btn-voice-tab.active {
-      background-color: #2e7d32;
-      color: white;
-      border-color: #2e7d32;
-      border-bottom: 3px solid #2e7d32;
-      box-shadow: 0 -4px 10px rgba(46,125,50,0.4);
-    }
+    .voice-guide { background: #fff9c4; border: 1px solid #fbc02d; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; color: #333; }
+    .mic-btn { width: 100%; padding: 20px; background-color: #388e3c; color: white; border: none; border-radius: 50px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+    .mic-btn.recording { background-color: #d32f2f; animation: pulse 1s infinite alternate; }
+    @keyframes pulse { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); } to { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); } }
 
-    #btn-quiz-tab {
-      background-color: #bbdefb;
-      color: #0d47a1;
-      border-color: #90caf9;
-    }
+    .voice-warning { background-color: #d32f2f; color: white; font-weight: bold; text-align: center; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 1.2em; animation: shake 0.5s infinite; }
+    @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
 
-    #btn-quiz-tab.active {
-      background-color: #1976d2;
-      color: white;
-      border-color: #1976d2;
-      border-bottom: 3px solid #1976d2;
-      box-shadow: 0 -4px 10px rgba(25,118,210,0.4);
-    }
+    .quiz-card { background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; }
+    .quiz-question { font-size: 1.2em; font-weight: bold; margin: 20px 0; color: #333; line-height: 1.5; word-break: keep-all; min-height: 60px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt-btn { padding: 15px; font-size: 1.1em; font-weight: bold; background: #ffffff; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; transition: 0.2s; word-break: keep-all; color: #444; text-align: left; }
+    .quiz-opt-btn:hover, .quiz-opt-btn:active { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
 
-    #btn-setting-tab {
-      background-color: #e0e0e0;
-      color: #555;
-    }
+    .quiz-result { margin-top: 20px; font-size: 1.1em; font-weight: bold; padding: 15px; border-radius: 8px; animation: popIn 0.5s ease-out; line-height: 1.5; text-align: left; }
+    .quiz-result.correct { background: #c8e6c9; color: #2e7d32; border: 2px solid #4caf50; }
+    .quiz-result.wrong { background: #ffcdd2; color: #c62828; border: 2px solid #f44336; }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    #btn-setting-tab.active {
-      background-color: #455a64;
-      color: white;
-      border-color: #455a64;
-      border-bottom: 3px solid #455a64;
-      box-shadow: 0 -4px 10px rgba(69,90,100,0.4);
-    }
+    .settings-card { background-color: #fafafa; border: 1px solid #ddd; border-radius: 10px; padding: 15px; }
+    .setting-item { padding: 15px 0; border-bottom: 1px dashed #ccc; }
+    .setting-item p { font-size: 0.95em; color: #444; font-weight: bold; margin-top: 0; margin-bottom: 10px; }
 
-    main {
-      padding: 20px;
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .status-card {
-      border-radius: 10px;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-      font-weight: bold;
-      border: 1px solid #ccc;
-    }
-
-    .status-card.safe {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border-color: #c8e6c9;
-    }
-
-    .status-card.danger {
-      background-color: #ffebee;
-      color: #c62828;
-      border-color: #ffcdd2;
-    }
-
-    .icon {
-      font-size: 1.5em;
-      margin-right: 10px;
-    }
-
-    h2#status-text {
-      margin: 0;
-      font-size: 1.1em;
-    }
-
-    .input-section p {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .paste-btn {
-      width: 100%;
-      padding: 15px;
-      background-color: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3);
-      transition: 0.2s;
-    }
-
-    .paste-btn:hover, .paste-btn:active {
-      background-color: #f57c00;
-    }
-
-    textarea {
-      width: 100%;
-      height: 110px;
-      padding: 12px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      font-size: 1em;
-      resize: none;
-      box-sizing: border-box;
-      margin-bottom: 15px;
-    }
-
-    .analyze-btn {
-      width: 100%;
-      padding: 15px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .result-box {
-      margin-bottom: 20px;
-      padding: 15px;
-      background-color: #f9f9f9;
-      border-left: 5px solid #003366;
-      border-radius: 4px;
-      line-height: 1.6;
-      word-break: keep-all;
-      white-space: pre-line;
-    }
-
-    .sos-btn {
-      width: 100%;
-      padding: 16px;
-      background-color: #d32f2f;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      font-weight: bold;
-      margin-top: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(211,47,47,0.3);
-    }
-
-    .voice-guide {
-      background: #fff9c4;
-      border: 1px solid #fbc02d;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    .mic-btn {
-      width: 100%;
-      padding: 20px;
-      background-color: #388e3c;
-      color: white;
-      border: none;
-      border-radius: 50px;
-      font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: 0.3s;
-    }
-
-    .mic-btn.recording {
-      background-color: #d32f2f;
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(211,47,47,0.7);
-      }
-      to {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 15px rgba(211,47,47,0);
-      }
-    }
-
-    .voice-warning {
-      background-color: #d32f2f;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 1.2em;
-      animation: shake 0.5s infinite;
-    }
-
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
-
-    .quiz-card {
-      background: #fafafa;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .quiz-question {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin: 20px 0;
-      color: #333;
-      line-height: 1.5;
-      word-break: keep-all;
-      min-height: 60px;
-    }
-
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .quiz-opt-btn {
-      padding: 15px;
-      font-size: 1.05em;
-      font-weight: bold;
-      background: #ffffff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
-      word-break: keep-all;
-      color: #444;
-      text-align: left;
-    }
-
-    .quiz-opt-btn:hover, .quiz-opt-btn:active {
-      background: #e3f2fd;
-      border-color: #2196f3;
-      color: #0d47a1;
-    }
-
-    .quiz-result {
-      margin-top: 20px;
-      font-size: 1.05em;
-      font-weight: bold;
-      padding: 15px;
-      border-radius: 8px;
-      animation: popIn 0.5s ease-out;
-      line-height: 1.5;
-      text-align: left;
-      white-space: pre-line;
-    }
-
-    .quiz-result.correct {
-      background: #c8e6c9;
-      color: #2e7d32;
-      border: 2px solid #4caf50;
-    }
-
-    .quiz-result.wrong {
-      background: #ffcdd2;
-      color: #c62828;
-      border: 2px solid #f44336;
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .settings-card {
-      background-color: #fafafa;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-    }
-
-    .setting-item {
-      padding: 15px 0;
-      border-bottom: 1px dashed #ccc;
-    }
-
-    .setting-item p {
-      font-size: 0.95em;
-      color: #444;
-      font-weight: bold;
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .font-size-group {
-      display: flex;
-      gap: 10px;
-    }
-
-    .font-btn {
-      flex: 1;
-      padding: 10px;
-      background: white;
-      border: 1px solid #aaa;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #333;
-    }
-
-    .font-btn.active {
-      background: #2e7d32;
-      color: white;
-      border-color: #2e7d32;
-    }
-
+    .font-size-group { display: flex; gap: 10px; }
+    .font-btn { flex: 1; padding: 10px; background: white; border: 1px solid #aaa; border-radius: 5px; cursor: pointer; color: #333; }
+    .font-btn.active { background: #2e7d32; color: white; border-color: #2e7d32; }
     .font-btn.normal { font-size: 15px; font-weight: 500; }
     .font-btn.large { font-size: 18px; font-weight: 700; }
     .font-btn.xlarge { font-size: 21px; font-weight: 900; letter-spacing: -1px; }
 
-    .phone-input-group {
-      display: flex;
-      gap: 10px;
-    }
+    .phone-input-group { display: flex; gap: 10px; }
+    .phone-input-group input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; }
 
-    .phone-input-group input {
-      flex-grow: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 1em;
-    }
+    .save-btn { background-color: #2e7d32; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .as-btn { width: 100%; padding: 12px; background-color: #555; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-    .save-btn {
-      background-color: #2e7d32;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal-buttons { margin-top: 20px; }
 
-    .as-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #555;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .confirm-btn { background: #d32f2f; color: white; padding: 12px; border: none; border-radius: 5px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
+    .cancel-btn { background: #757575; color: white; padding: 12px; border: none; border-radius: 5px; width: 100%; font-weight: bold; cursor: pointer; }
 
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      width: 85%;
-      max-width: 320px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .modal-buttons {
-      margin-top: 20px;
-    }
-
-    .confirm-btn {
-      background: #d32f2f;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      width: 100%;
-      margin-bottom: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .cancel-btn {
-      background: #757575;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      width: 100%;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .reset-btn {
-      width: 100%;
-      padding: 15px;
-      background-color: #757575;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .reset-btn:hover {
-      background-color: #616161;
-    }
-
-    .notice-box {
-      background: #eef6ff;
-      border: 1px solid #b6d4fe;
-      color: #0c5460;
-      border-radius: 8px;
-      padding: 12px;
-      line-height: 1.5;
-      margin-bottom: 15px;
-      white-space: pre-line;
-    }
+    .reset-btn { width: 100%; padding: 15px; background-color: #757575; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .reset-btn:hover { background-color: #616161; }
   </style>
 </head>
 <body class="font-normal">
@@ -570,7 +119,6 @@
     </div>
 
     <main>
-      <!-- 문자 탭 -->
       <div id="sms-tab" class="tab-content active">
         <div id="status" class="status-card safe">
           <div class="icon">✅</div>
@@ -581,55 +129,42 @@
           <p>의심되는 문자를 붙여넣으세요</p>
           <button onclick="pasteFromClipboard()" id="btn-paste" class="paste-btn">📋 복사한 문자 한 번에 붙여넣기</button>
           <textarea id="userInput" placeholder="예: [국제발신] 해외결제 승인완료..."></textarea>
-          <button onclick="analyzeText()" class="analyze-btn" id="analyze-text-btn">🔍 정밀 문자 분석 시작</button>
+          <button onclick="analyzeText()" class="analyze-btn">🔍 정밀 문자 분석 시작</button>
         </div>
 
         <div id="result-box" class="result-box" style="display:none;">
-          <h3>분석 결과</h3>
-          <div id="analysis-result"></div>
+          <h3>분석 결과:</h3>
+          <p id="analysis-result"></p>
         </div>
 
-        <button onclick="resetSms()" id="btn-reset-sms" class="reset-btn" style="display:none; margin-top:15px;">🔄 내용 지우고 새 문자 검사하기</button>
+        <button onclick="resetSms()" id="btn-reset-sms" class="reset-btn" style="display:none; margin-top: 15px;">🔄 내용 지우고 새 문자 검사하기</button>
         <button onclick="openSosModal('sms')" class="sos-btn">🚨 가족에게 긴급 SOS 보내기</button>
       </div>
 
-      <!-- 통화 탭 -->
       <div id="voice-tab" class="tab-content">
         <div class="voice-guide">
           <p>의심스러운 전화를 받으셨나요?</p>
-          <p><b>1. 스피커폰을 켭니다.</b><br><b>2. 아래 버튼을 누르세요.</b></p>
-        </div>
-
-        <div class="notice-box">
-실시간 감청은 기기와 브라우저 환경에 따라 다르게 작동할 수 있습니다.
-특히 아이폰 Safari에서는 제한될 수 있습니다.
-갤럭시 Chrome/삼성인터넷에서 먼저 테스트하시는 것이 좋습니다.
+          <p><b>1. '스피커폰'을 켭니다.</b><br><b>2. 아래 버튼을 누르세요.</b></p>
         </div>
 
         <button id="mic-btn" onclick="toggleVoice()" class="mic-btn">🎙️ 실시간 감청 시작</button>
-
-        <div id="voice-warning" class="voice-warning" style="display:none;">
-          🚨 경고! 사기 금지어 탐지!<br>당장 전화를 끊으십시오!
-        </div>
-
+        <div id="voice-warning" class="voice-warning" style="display:none;">🚨 경고! 사기 금지어 탐지!<br>당장 전화를 끊으십시오!</div>
         <textarea id="voiceInput" placeholder="통화 내용이 실시간으로 받아적힙니다..." readonly></textarea>
-        <button onclick="analyzeVoice()" class="analyze-btn" id="analyze-voice-btn" style="background-color:#f57c00; margin-bottom:15px;">🧠 통화 내용 종합 판독</button>
+        <button onclick="analyzeVoice()" class="analyze-btn" style="background-color: #f57c00; margin-bottom: 15px;">🧠 통화 내용 종합 판독</button>
 
         <div id="voice-result-box" class="result-box" style="display:none;">
-          <h3>통화 판독 결과</h3>
-          <div id="voice-analysis-result"></div>
+          <h3>통화 판독 결과:</h3>
+          <p id="voice-analysis-result"></p>
         </div>
 
-        <button onclick="resetVoice()" id="btn-reset-voice" class="reset-btn" style="display:none; margin-top:15px; margin-bottom:15px;">🔄 내용 지우고 새 통화 감청하기</button>
+        <button onclick="resetVoice()" id="btn-reset-voice" class="reset-btn" style="display:none; margin-top: 15px; margin-bottom: 15px;">🔄 내용 지우고 새 통화 감청하기</button>
         <button onclick="openSosModal('voice')" class="sos-btn">🚨 통화내용 SOS 보내기</button>
       </div>
 
-      <!-- 퀴즈 탭 -->
       <div id="quiz-tab" class="tab-content">
         <div class="quiz-card">
-          <h3 style="margin-top:0; color:#1565c0;">📝 오늘의 상식 퀴즈</h3>
-          <p id="quiz-topic" style="color:#2e7d32; font-weight:bold; background:#e8f5e9; padding:5px; border-radius:5px; display:inline-block;">분야: 출제 대기 중...</p>
-
+          <h3 style="margin-top: 0; color: #1565c0;">📝 오늘의 상식 퀴즈</h3>
+          <p id="quiz-topic" style="color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 5px; border-radius: 5px; display: inline-block;">분야: 건강, 시사, 역사, 생활</p>
           <div id="quiz-question-box" class="quiz-question">아래 버튼을 눌러 오늘의 문제를 받아보세요!</div>
 
           <div id="quiz-options" class="quiz-options" style="display:none;">
@@ -640,14 +175,13 @@
 
           <div id="quiz-result" class="quiz-result" style="display:none;"></div>
 
-          <button onclick="generateQuiz()" class="analyze-btn" id="quiz-btn" style="margin-top:20px; background-color:#1976d2;">🔄 새 문제 받기</button>
+          <button onclick="generateQuiz()" class="analyze-btn" style="margin-top:20px; background-color:#1976d2; box-shadow: 0 4px 6px rgba(25,118,210,0.3);">🔄 새 문제 받기</button>
         </div>
       </div>
 
-      <!-- 설정 탭 -->
       <div id="setting-tab" class="tab-content">
         <div class="settings-card">
-          <h3 style="text-align:center; margin-top:0; color:#333;">⚙️ 환경 설정</h3>
+          <h3 style="text-align: center; margin-top: 0; color: #333;">⚙️ 환경 설정</h3>
 
           <div class="setting-item">
             <p>🔍 글자 크기 조절</p>
@@ -664,10 +198,10 @@
               <input type="tel" id="guardian-phone" placeholder="예: 01012345678">
               <button onclick="savePhone()" class="save-btn">저장</button>
             </div>
-            <p id="save-msg" style="color:#2e7d32; font-weight:bold; display:none; margin-top:10px;">✅ 저장되었습니다!</p>
+            <p id="save-msg" style="color: #2e7d32; font-weight: bold; display: none; margin-top: 10px;">✅ 저장되었습니다!</p>
           </div>
 
-          <div class="setting-item" style="border-bottom:none;">
+          <div class="setting-item" style="border-bottom: none;">
             <p>🛠️ 앱 사용 중 에러가 발생했나요?</p>
             <button onclick="openAsModal()" class="as-btn">고객센터 A/S 신청</button>
           </div>
@@ -675,11 +209,10 @@
       </div>
     </main>
 
-    <!-- SOS 모달 -->
     <div id="sos-modal" class="modal" style="display:none;">
       <div class="modal-content">
         <h2>🚨 긴급 상황 전파</h2>
-        <p>수집된 내용과 분석 결과를 가족에게 전송하시겠습니까?</p>
+        <p>수집된 증거와 분석 결과를<br>가족에게 전송하시겠습니까?</p>
         <div class="modal-buttons">
           <button onclick="sendSos()" class="confirm-btn">네, 전송합니다</button>
           <button onclick="closeModal('sos-modal')" class="cancel-btn">취소</button>
@@ -687,13 +220,12 @@
       </div>
     </div>
 
-    <!-- AS 모달 -->
     <div id="as-modal" class="modal" style="display:none;">
       <div class="modal-content">
         <h2>🛠️ A/S 및 오류 신고</h2>
-        <textarea id="asInput" placeholder="불편사항을 적어주세요." style="height:80px;"></textarea>
+        <textarea id="asInput" placeholder="불편사항을 적어주세요." style="height: 80px;"></textarea>
         <div class="modal-buttons">
-          <button onclick="submitAs()" class="confirm-btn" style="background-color:#003366;">신고 접수</button>
+          <button onclick="submitAs()" class="confirm-btn" style="background-color: #003366;">신고 접수</button>
           <button onclick="closeModal('as-modal')" class="cancel-btn">닫기</button>
         </div>
       </div>
@@ -701,22 +233,18 @@
   </div>
 
   <script>
-    // 이미 확인된 Apps Script 웹앱 주소를 그대로 넣었습니다.
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZ41gobPzd2_aMOYLK-DncUBMoYq9vjrqUWiOOyaHYxu_yHh8m9Yos1MW2Nk5x_ur2Ew/exec';
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ41gobPzd2_aMOYLK-DncUBMoYq9vjrqUWiOOyaHYxu_yHh8m9Yos1MW2Nk5x_ur2Ew/exec";
 
     let currentSosType = 'sms';
-    let latestAnalysisSummary = '분석 전입니다.';
+    let latestAnalysisSummary = "분석 전입니다.";
     let recognition = null;
     let isListening = false;
-    let currentQuizAnswerIndex = -1;
-    let currentQuizExplanation = '';
 
     window.onload = function() {
       const savedPhone = localStorage.getItem('guardianPhone');
       if (savedPhone) {
         document.getElementById('guardian-phone').value = savedPhone;
       }
-
       const savedFontSize = localStorage.getItem('appFontSize') || 'normal';
       changeFontSize(savedFontSize);
       generateQuiz();
@@ -734,108 +262,110 @@
       document.getElementById(`btn-${tabName}`).classList.add('active');
     }
 
-    async function callBackend(action, payload = {}) {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action,
-          ...payload
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('서버 응답 실패');
-      }
-
-      const data = await response.json();
-      if (!data.ok) {
-        throw new Error(data.message || '백엔드 처리 실패');
-      }
-      return data;
-    }
-
     async function pasteFromClipboard() {
       try {
         const text = await navigator.clipboard.readText();
-        if (!text || !text.trim()) {
-          alert('복사된 글자가 없습니다. 먼저 문자를 복사해 주세요.');
+        if (text.trim() === "") {
+          alert("복사된 글자가 없습니다. 스마트폰에서 문자를 먼저 복사해 주세요!");
           return;
         }
 
         document.getElementById('userInput').value = text;
 
         const btn = document.getElementById('btn-paste');
-        const originalText = '📋 복사한 문자 한 번에 붙여넣기';
-        btn.innerText = '✅ 쏙! 붙여넣기 완료!';
-        btn.style.backgroundColor = '#4caf50';
+        const originalText = "📋 복사한 문자 한 번에 붙여넣기";
+        btn.innerText = "✅ 쏙! 붙여넣기 완료!";
+        btn.style.backgroundColor = "#4caf50";
 
         setTimeout(() => {
           btn.innerText = originalText;
-          btn.style.backgroundColor = '#ff9800';
+          btn.style.backgroundColor = "#ff9800";
         }, 2000);
 
-      } catch (e) {
-        alert('자동 붙여넣기가 차단되었습니다. 입력칸을 길게 눌러 붙여넣기를 선택해 주세요.');
+      } catch (err) {
+        alert("⚠️ 자동 붙여넣기가 차단되었습니다. 빈칸을 길게 눌러 '붙여넣기'를 선택해 주세요.");
       }
     }
 
+    async function callBackend(action, payload) {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, payload })
+      });
+
+      if (!response.ok) {
+        throw new Error("백엔드 호출 실패");
+      }
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        throw new Error(data.message || "처리 실패");
+      }
+
+      return data;
+    }
+
     async function analyzeText() {
-      const input = document.getElementById('userInput').value.trim();
-      if (!input) {
-        alert('검사할 문자를 입력해 주십시오!');
+      const input = document.getElementById('userInput').value;
+      if (input.trim() === "") {
+        alert("검사할 문자를 입력해 주십시오!");
         return;
       }
 
-      const btn = document.getElementById('analyze-text-btn');
-      btn.innerText = '⏳ 분석 중...';
-      btn.style.backgroundColor = '#555';
+      const btn = document.querySelector('#sms-tab .analyze-btn');
+      btn.innerText = "⏳ 정밀 분석 중...";
+      btn.style.backgroundColor = "#555";
 
       try {
-        const data = await callBackend('analyzeText', { text: input });
+        const data = await callBackend("analyze_sms", { text: input });
+        const result = data.result;
 
-        document.getElementById('analysis-result').innerHTML = data.html;
-        document.getElementById('result-box').style.display = 'block';
-        document.getElementById('btn-reset-sms').style.display = 'block';
-
-        latestAnalysisSummary = data.summary || '분석 완료';
+        document.getElementById('analysis-result').innerHTML = result.html;
+        document.getElementById('result-box').style.display = "block";
+        document.getElementById('btn-reset-sms').style.display = "block";
+        latestAnalysisSummary = result.summary || "분석 완료";
 
         const status = document.getElementById('status');
-        const statusText = document.getElementById('status-text');
-        const statusIcon = document.querySelector('#status .icon');
+        const icon = document.querySelector('#status .icon');
+        const text = document.getElementById('status-text');
 
-        if (data.level === 'danger') {
-          status.className = 'status-card danger';
-          statusText.innerText = '보안 상태: 🚨 위험 감지!';
-          statusIcon.innerText = '🚨';
-        } else if (data.level === 'warning') {
-          status.className = 'status-card safe';
-          statusText.innerText = '보안 상태: ⚠️ 주의 요망';
-          statusIcon.innerText = '⚠️';
+        if (result.level === "danger") {
+          status.className = "status-card danger";
+          icon.innerText = "🚨";
+          text.innerText = "보안 상태: 🚨 위험 감지!";
+        } else if (result.level === "caution") {
+          status.className = "status-card safe";
+          icon.innerText = "⚠️";
+          text.innerText = "보안 상태: ⚠️ 주의 요망";
         } else {
-          status.className = 'status-card safe';
-          statusText.innerText = '보안 상태: ✅ 안전';
-          statusIcon.innerText = '✅';
+          status.className = "status-card safe";
+          icon.innerText = "✅";
+          text.innerText = "보안 상태: ✅ 안전";
         }
       } catch (e) {
-        alert('문자 분석 중 오류가 발생했습니다.');
+        alert("문자 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
       } finally {
-        btn.innerText = '🔍 정밀 문자 분석 시작';
-        btn.style.backgroundColor = '#003366';
+        btn.innerText = "🔍 정밀 문자 분석 시작";
+        btn.style.backgroundColor = "#003366";
       }
     }
 
     function resetSms() {
-      document.getElementById('userInput').value = '';
-      document.getElementById('result-box').style.display = 'none';
-      document.getElementById('btn-reset-sms').style.display = 'none';
+      document.getElementById('userInput').value = "";
+      document.getElementById('result-box').style.display = "none";
+      document.getElementById('btn-reset-sms').style.display = "none";
 
-      const status = document.getElementById('status');
-      status.className = 'status-card safe';
-      document.getElementById('status-text').innerText = '현재 문자 보안: 안전';
-      document.querySelector('#status .icon').innerText = '✅';
+      const statusCard = document.getElementById('status');
+      statusCard.className = "status-card";
+      statusCard.style.backgroundColor = "#ffffff";
+      statusCard.style.borderColor = "#ccc";
+      statusCard.style.color = "#333";
 
-      latestAnalysisSummary = '분석 전입니다.';
+      document.getElementById('status-text').innerText = "보안 상태: 🔍 대기 중";
+      document.querySelector('#status .icon').innerText = "🛡️";
+      latestAnalysisSummary = "분석 전입니다.";
     }
 
     function toggleVoice() {
@@ -848,8 +378,9 @@
 
     function startVoice() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
       if (!SpeechRecognition) {
-        alert('현재 기기 또는 브라우저에서는 실시간 음성 인식을 지원하지 않습니다. 갤럭시 Chrome 또는 삼성 인터넷에서 먼저 테스트해 주세요.');
+        alert("⚠️ 현재 사용 중인 기기 또는 브라우저에서는 실시간 음성 인식을 지원하지 않습니다.");
         return;
       }
 
@@ -862,30 +393,24 @@
         recognition.onstart = function() {
           isListening = true;
           const btn = document.getElementById('mic-btn');
-          btn.innerText = '🛑 감청 중지 (터치하여 종료)';
+          btn.innerText = "🛑 감청 중지 (터치하여 종료)";
           btn.classList.add('recording');
-
-          document.getElementById('voiceInput').value = '';
-          document.getElementById('voice-warning').style.display = 'none';
+          document.getElementById('voiceInput').value = "";
+          document.getElementById('voice-warning').style.display = "none";
           document.body.classList.remove('flash-red');
         };
 
         recognition.onresult = function(event) {
           let finalTranscript = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-              finalTranscript += event.results[i][0].transcript + ' ';
+              finalTranscript += event.results[i][0].transcript + " ";
             }
           }
-
           if (finalTranscript) {
             document.getElementById('voiceInput').value += finalTranscript;
             checkPhishingKeywords(document.getElementById('voiceInput').value);
           }
-        };
-
-        recognition.onerror = function() {
-          stopVoice();
         };
 
         recognition.onend = function() {
@@ -893,8 +418,9 @@
         };
 
         recognition.start();
+
       } catch (e) {
-        alert('마이크 권한 또는 음성 인식 시작에 문제가 발생했습니다.');
+        alert("마이크 접근 권한이 없거나 오류가 발생했습니다.");
         stopVoice();
       }
     }
@@ -904,80 +430,76 @@
         try { recognition.stop(); } catch (e) {}
       }
       isListening = false;
-      const btn = document.getElementById('mic-btn');
-      btn.innerText = '🎙️ 실시간 감청 시작';
-      btn.classList.remove('recording');
+      document.getElementById('mic-btn').innerText = "🎙️ 실시간 감청 시작";
+      document.getElementById('mic-btn').classList.remove('recording');
       document.body.classList.remove('flash-red');
     }
 
     function checkPhishingKeywords(text) {
-      const keywords = ['검찰', '경찰', '계좌', '비밀번호', '송금', '원격', '상품권', '구속', '대포통장', '수사관', '안전계좌', '대출'];
-      const found = keywords.some(kw => text.includes(kw));
-      if (found) {
-        document.getElementById('voice-warning').style.display = 'block';
+      const keywords = ['검찰', '경찰', '계좌', '비밀번호', '송금', '원격', '상품권', '구속', '대포통장', '수사관', '안전계좌', '보증인'];
+      if (keywords.some(kw => text.includes(kw))) {
+        document.getElementById('voice-warning').style.display = "block";
         document.body.classList.add('flash-red');
       }
     }
 
     async function analyzeVoice() {
-      const input = document.getElementById('voiceInput').value.trim();
-      if (!input) {
-        alert('녹음된 통화 내용이 없습니다!');
+      const input = document.getElementById('voiceInput').value;
+      if (input.trim() === "") {
+        alert("녹음된 통화 내용이 없습니다!");
         return;
       }
 
-      const btn = document.getElementById('analyze-voice-btn');
-      btn.innerText = '⏳ 판독 중...';
-      btn.style.backgroundColor = '#555';
+      const btn = document.querySelector('#voice-tab .analyze-btn');
+      btn.innerText = "⏳ 판독 중...";
+      btn.style.backgroundColor = "#555";
 
       try {
-        const data = await callBackend('analyzeVoice', { text: input });
+        const data = await callBackend("analyze_voice", { text: input });
+        const result = data.result;
 
-        document.getElementById('voice-analysis-result').innerHTML = data.html;
-        document.getElementById('voice-result-box').style.display = 'block';
-        document.getElementById('btn-reset-voice').style.display = 'block';
-        latestAnalysisSummary = data.summary || '통화 분석 완료';
+        document.getElementById('voice-analysis-result').innerHTML = result.html;
+        document.getElementById('voice-result-box').style.display = "block";
+        document.getElementById('btn-reset-voice').style.display = "block";
+        latestAnalysisSummary = result.summary || "통화 분석 완료";
       } catch (e) {
-        alert('통화 분석 중 오류가 발생했습니다.');
+        alert("통화 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
       } finally {
-        btn.innerText = '🧠 통화 내용 종합 판독';
-        btn.style.backgroundColor = '#f57c00';
+        btn.innerText = "🧠 통화 내용 종합 판독";
+        btn.style.backgroundColor = "#f57c00";
       }
     }
 
     function resetVoice() {
-      document.getElementById('voiceInput').value = '';
-      document.getElementById('voice-result-box').style.display = 'none';
-      document.getElementById('btn-reset-voice').style.display = 'none';
-      document.getElementById('voice-warning').style.display = 'none';
+      document.getElementById('voiceInput').value = "";
+      document.getElementById('voice-result-box').style.display = "none";
+      document.getElementById('btn-reset-voice').style.display = "none";
+      document.getElementById('voice-warning').style.display = "none";
       document.body.classList.remove('flash-red');
-      latestAnalysisSummary = '분석 전입니다.';
+      latestAnalysisSummary = "분석 전입니다.";
     }
 
     async function generateQuiz() {
-      const btn = document.getElementById('quiz-btn');
-      btn.innerText = '⏳ 문제 불러오는 중...';
-
       document.getElementById('quiz-options').style.display = 'none';
       document.getElementById('quiz-result').style.display = 'none';
-      document.getElementById('quiz-question-box').innerText = '문제를 불러오는 중입니다...';
+      document.getElementById('quiz-question-box').innerHTML = "<b>문제를 불러오는 중입니다...</b>";
 
       try {
-        const data = await callBackend('getQuiz');
+        const data = await callBackend("get_quiz", {});
+        const quiz = data.quiz;
 
-        document.getElementById('quiz-topic').innerText = `분야: ${data.topic}`;
-        document.getElementById('quiz-question-box').innerHTML = `<b>Q. ${data.question}</b>`;
-        document.getElementById('opt-0').innerText = `① ${data.options[0]}`;
-        document.getElementById('opt-1').innerText = `② ${data.options[1]}`;
-        document.getElementById('opt-2').innerText = `③ ${data.options[2]}`;
+        document.getElementById('quiz-topic').innerText = `분야: ${quiz.category}`;
+        document.getElementById('quiz-question-box').innerHTML = `<b>Q. ${quiz.question}</b>`;
+        document.getElementById('opt-0').innerText = `① ${quiz.options[0]}`;
+        document.getElementById('opt-1').innerText = `② ${quiz.options[1]}`;
+        document.getElementById('opt-2').innerText = `③ ${quiz.options[2]}`;
 
-        currentQuizAnswerIndex = data.answerIndex;
-        currentQuizExplanation = data.explanation || '';
+        window.currentCorrectAnswerIndex = quiz.answerIndex;
+        window.currentExplanation = quiz.explanation;
+
         document.getElementById('quiz-options').style.display = 'flex';
       } catch (e) {
-        document.getElementById('quiz-question-box').innerText = '퀴즈를 불러오는 중 오류가 발생했습니다.';
-      } finally {
-        btn.innerText = '🔄 새 문제 받기';
+        document.getElementById('quiz-question-box').innerHTML = "<b>퀴즈를 불러오는 중 오류가 발생했습니다.</b>";
       }
     }
 
@@ -985,12 +507,12 @@
       const resultBox = document.getElementById('quiz-result');
       resultBox.style.display = 'block';
 
-      if (selectedIndex === currentQuizAnswerIndex) {
+      if (selectedIndex === window.currentCorrectAnswerIndex) {
         resultBox.className = 'quiz-result correct';
-        resultBox.innerHTML = `🎉 정답입니다!\n\n💡 해설: ${currentQuizExplanation}`;
+        resultBox.innerHTML = `🎉 정답입니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
       } else {
         resultBox.className = 'quiz-result wrong';
-        resultBox.innerHTML = `😅 아쉽습니다. 오답입니다.\n\n💡 해설: ${currentQuizExplanation}`;
+        resultBox.innerHTML = `😅 아쉽습니다!<br><br><span style="font-size:0.9em; font-weight:normal; color:#333;">💡 해설: ${window.currentExplanation}</span>`;
       }
     }
 
@@ -1010,14 +532,16 @@
     function savePhone() {
       const cleanPhone = document.getElementById('guardian-phone').value.replace(/[^0-9]/g, '');
       if (cleanPhone.length < 9) {
-        alert('올바른 전화번호를 입력하세요.');
+        alert("올바른 전화번호를 입력하세요.");
         return;
       }
+
       localStorage.setItem('guardianPhone', cleanPhone);
       document.getElementById('guardian-phone').value = cleanPhone;
-      document.getElementById('save-msg').style.display = 'block';
+      document.getElementById('save-msg').style.display = "block";
+
       setTimeout(() => {
-        document.getElementById('save-msg').style.display = 'none';
+        document.getElementById('save-msg').style.display = "none";
       }, 3000);
     }
 
@@ -1039,39 +563,27 @@
     function sendSos() {
       const savedPhone = localStorage.getItem('guardianPhone');
       if (!savedPhone) {
-        alert('설정 탭에서 가족 전화번호를 먼저 저장해 주세요.');
+        alert("⚠️ 설정 탭에서 자녀분의 번호를 저장해주세요!");
         closeModal('sos-modal');
         openTab('setting-tab');
         return;
       }
 
-      let content = '';
-      if (currentSosType === 'sms') {
-        content = document.getElementById('userInput').value.trim();
-      } else {
-        content = document.getElementById('voiceInput').value.trim();
-      }
+      let content = currentSosType === 'sms'
+        ? document.getElementById('userInput').value
+        : document.getElementById('voiceInput').value;
 
-      if (!content) {
-        content = '(입력된 내용 없음)';
-      }
+      if (content.trim() === "") content = "(입력된 내용 없음)";
 
-      const message =
-`[가족 안심가드 긴급상황 🚨]
-가족 여러분, 아래 내용을 확인해 주세요.
+      const message = `[가족 안심가드 긴급상황 🚨] 가족 여러분, 아래 내용 확인 부탁드립니다! ■ 앱 분석 결과: ${latestAnalysisSummary} ■ 수집된 증거 본문: ${content}`;
 
-■ 앱 분석 결과
-${latestAnalysisSummary}
-
-■ 원문
-${content}`;
-
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isIOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
       const separator = isIOS ? '&' : '?';
 
       const hiddenLink = document.createElement('a');
       hiddenLink.href = `sms:${savedPhone}${separator}body=${encodeURIComponent(message)}`;
       hiddenLink.target = '_blank';
+
       document.body.appendChild(hiddenLink);
       hiddenLink.click();
       document.body.removeChild(hiddenLink);
@@ -1080,11 +592,11 @@ ${content}`;
     }
 
     function submitAs() {
-      const asText = document.getElementById('asInput').value.trim();
-      if (!asText) return;
+      const asText = document.getElementById('asInput').value;
+      if (asText.trim() === "") return;
 
-      alert(`✅ A/S 접수가 완료되었습니다!\n\n[내용]\n${asText}`);
-      document.getElementById('asInput').value = '';
+      alert("✅ A/S 접수가 완료되었습니다!\n[내용]: " + asText);
+      document.getElementById('asInput').value = "";
       closeModal('as-modal');
     }
   </script>
